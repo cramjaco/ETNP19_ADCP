@@ -1,0 +1,75 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+The point of this script was, on the KM, to check the amplitude signal on the ADCP.
+It has been modified to look at data after the cruise was over.
+Currently files are not fully up to date.
+
+
+```{r}
+library(oce)
+library(ncdf4)
+library(tidyverse)
+```
+
+Load in the narrow band data. This can be ammended for broadband or workhorse data.
+
+```{r}
+ncdfName <- "os38nb.nc"
+```
+
+```{r}
+data38nb <- read.netcdf(ncdfName)
+```
+
+
+Some processing
+
+
+```{r}
+allDepth <- data38nb@data$depth
+depthL <- dim(allDepth)[1]
+oneDepth <- allDepth[,depthL]
+oneDepth
+standInTime <- 1:dim(allDepth)[2]
+standInTime %>% head
+lastRead <- dim(allDepth)[2]
+```
+
+ADCP Modified Image
+
+```{r}
+library(viridis)
+```
+
+
+# Pull in time data.
+Doesn't work with oce package, but does with ncdf4, so I'm doing that.
+
+
+
+```{r}
+ncin <- nc_open(ncdfName)
+#print(ncin)
+time <- ncvar_get(ncin, "time")
+time %>% head
+```
+
+```{r}
+image(x = c(time), y = c(oneDepth),  z = t(data38nb@data$amp), ylim = c(500, 0), col = inferno(100))
+```
+Zoom in. This is from the last day that I updated things at P3 right now.
+
+```{r}
+lastTime2 <- tail(time,1)
+twoDaysAgo <- lastTime2 - 2
+image(x = c(time), y = c(oneDepth),  z = t(data38nb@data$amp), ylim = c(500, 0),
+      xlim = c(twoDaysAgo, lastTime2),
+      col = inferno(100))
+```
+
+To do: Convert times to posix.
+Use newist data. Current data is from the end of the cruise.
+
