@@ -1,0 +1,95 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+The point of this script is, on the KM, to check the amplitude signal on the ADCP
+
+
+```{r}
+library(oce)
+library(ncdf4)
+library(tidyverse)
+```
+
+Load in data from the server. Refresses every 15 min or so.
+
+```{r}
+adcpDir <- "/run/user/1000/gvfs/smb-share:server=kmnas.km.soest.hawaii.edu,share=adcp/proc/os38bb/contour"
+ncdfName <- "os38bb.nc"
+fullPath <- paste(adcpDir, ncdfName, sep = "/")
+```
+
+# If I wanted the workhorse
+adcpDir <- "/run/user/1000/gvfs/smb-share:server=kmnas.km.soest.hawaii.edu,share=adcp/proc/wh300/contour"
+ncdfName <- "wh300.nc"
+fullPath <- paste(adcpDir, ncdfName, sep = "/")
+
+Uncomment the block below to pull from the server. Only seems to work sometimes.
+
+```{r}
+#data38nb <- read.netcdf(fullPath)
+#data38nb
+```
+
+```{r}
+data38nb <- read.netcdf(ncdfName)
+```
+
+
+Some processing
+
+
+```{r}
+allDepth <- data38nb@data$depth
+depthL <- dim(allDepth)[1]
+oneDepth <- allDepth[,depthL]
+oneDepth
+standInTime <- 1:dim(allDepth)[2]
+standInTime %>% head
+lastRead <- dim(allDepth)[2]
+```
+
+ADCP Modified Image
+
+```{r}
+library(viridis)
+```
+
+everything
+
+```{r}
+image( x = c(0,standInTime), y = c(0,oneDepth),  z = t(data38nb@data$amp), ylim = c(1000, 0), col = inferno(100))
+```
+Zoomed in on where the action is.
+
+```{r}
+image( x = c(0,standInTime), y = c(0,oneDepth),  z = t(data38nb@data$amp), ylim = c(500, 0), xlim = c(lastRead - 600, lastRead), col = inferno(100))
+```
+
+# Now pull in time data
+
+
+
+```{r}
+ncin <- nc_open(ncdfName)
+#print(ncin)
+time <- ncvar_get(ncin, "time")
+time %>% head
+```
+
+```{r}
+image(x = c(time), y = c(oneDepth),  z = t(data38nb@data$amp), ylim = c(500, 0), col = inferno(100))
+```
+Zoom In
+
+```{r}
+lastTime2 <- tail(time,1)
+twoDaysAgo <- lastTime2 - 2
+image(x = c(time), y = c(oneDepth),  z = t(data38nb@data$amp), ylim = c(500, 0),
+      xlim = c(twoDaysAgo, lastTime2),
+      col = inferno(100))
+```
+
+Convert times to posix
+
