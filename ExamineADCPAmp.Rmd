@@ -1,7 +1,13 @@
 ---
-title: "R Notebook"
+title: "Examining ADCP Data from the ETNP19 Kilo Moana Cruise"
 output: html_notebook
+
 ---
+author: "Jacob Cram"
+
+email: "jcram@umces.edu"
+
+modified: "November 2019
 
 The point of this script was, on the KM, to check the amplitude signal on the ADCP.
 It has been modified to look at data after the cruise was over.
@@ -93,6 +99,4 @@ image(x = date, y = oneDepth,  z = t(data38nb@data$amp), ylim = c(500, 0),
 axis.POSIXct(1, seq(timeWindowStart, timeWindowEnd, by = "day"), format = "%b-%d", las = 2)
 ```
 
-To Do.
-Use newist data. Current data is from the end of the cruise.
 
