@@ -72,6 +72,7 @@ time2 <- sapply(time, function(x) paste(x, "2019", sep = "-"))
 ```
 
 # Plot of all of the ADCP data from the whole second leg of the cruise.
+All dates are in UTC. One could in theory convert to local time.
 
 ```{r}
 image(x = date, y = oneDepth,  z = t(data38nb@data$amp), ylim = c(500, 0), col = inferno(100), xaxt = "n")
