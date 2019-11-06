@@ -7,14 +7,20 @@ The point of this script was, on the KM, to check the amplitude signal on the AD
 It has been modified to look at data after the cruise was over.
 Currently files are not fully up to date.
 
+# Load in Required packages
+
 
 ```{r}
 library(oce)
 library(ncdf4)
 library(tidyverse)
+library(viridis)
+library(lubridate)
+
 ```
 
-Load in the narrow band data. This can be ammended for broadband or workhorse data.
+# Load in the narrow band data. 
+This can be ammended in order to use data from  broadband or workhorse adcp sensors
 
 ```{r}
 ncdfName <- "os38nb.nc"
@@ -25,7 +31,7 @@ data38nb <- read.netcdf(ncdfName)
 ```
 
 
-Some processing
+# Some initial processing
 
 
 ```{r}
@@ -40,14 +46,11 @@ lastRead <- dim(allDepth)[2]
 
 ADCP Modified Image
 
-```{r}
-library(viridis)
-```
+
 
 
 # Pull in time data.
 Doesn't work with oce package, but does with ncdf4, so I'm doing that.
-
 
 
 ```{r}
@@ -58,18 +61,37 @@ time %>% head
 ```
 
 ```{r}
-image(x = c(time), y = c(oneDepth),  z = t(data38nb@data$amp), ylim = c(500, 0), col = inferno(100))
+
+decimalDate <- 2019 + time/365
+date <- date_decimal(decimalDate)
 ```
-Zoom in. This is from the last day that I updated things at P3 right now.
+
 
 ```{r}
-lastTime2 <- tail(time,1)
-twoDaysAgo <- lastTime2 - 2
-image(x = c(time), y = c(oneDepth),  z = t(data38nb@data$amp), ylim = c(500, 0),
-      xlim = c(twoDaysAgo, lastTime2),
-      col = inferno(100))
+time2 <- sapply(time, function(x) paste(x, "2019", sep = "-"))
 ```
 
-To do: Convert times to posix.
+# Plot of all of the ADCP data from the whole second leg of the cruise.
+
+```{r}
+image(x = date, y = oneDepth,  z = t(data38nb@data$amp), ylim = c(500, 0), col = inferno(100), xaxt = "n")
+dr <- range(date)
+axis.POSIXct(1, seq(dr[1], dr[2], by = "day"), at = seq(dr[1], dr[2], by = "day"), format = "%b-%d", las = 2)
+```
+#Zoom in.
+This is data from two days that we were sampling.
+You can see the two deep adcp bands that migrate over the course of the day. The migration starts at dawn and ends at dusk.
+There is a secondary nighttime migration visible as well.
+
+```{r}
+timeWindowEnd <- as.POSIXct("2019-10-10 20:31:54", tz = "UTC")
+timeWindowStart <- timeWindowEnd - 60 * 60 * 24 * 2
+image(x = date, y = oneDepth,  z = t(data38nb@data$amp), ylim = c(500, 0),
+      xlim = c(timeWindowStart, timeWindowEnd),
+      col = inferno(100), xaxt = "n")
+axis.POSIXct(1, seq(timeWindowStart, timeWindowEnd, by = "day"), format = "%b-%d", las = 2)
+```
+
+To Do.
 Use newist data. Current data is from the end of the cruise.
 
