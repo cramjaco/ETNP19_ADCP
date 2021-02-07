@@ -149,13 +149,13 @@ P3_Night <- P3_Timepoints & Night_Timepoints
 
 ## Station P2
 ```{r}
-image(x = dateMex[P2_Timepoints], y = oneDepth,  z = (t(data38nb@data$amp))[P2_Timepoints,], ylim = c(500, 0), col = inferno(100), xaxt = "n")
+image(x = dateMex[P2_Timepoints] + (7 * 60^2), y = oneDepth,  z = (t(data38nb@data$amp))[P2_Timepoints,], ylim = c(500, 0), col = inferno(100), xaxt = "n")
 dr <- range(date)
 axis.POSIXct(1, seq(dr[1], dr[2], by = "day"), at = seq(dr[1], dr[2], by = "day"), format = "%b-%d", las = 2)
 ```
 ## Station P3
 ```{r}
-image(x = dateMex[P3_Timepoints], y = oneDepth,  z = (t(data38nb@data$amp))[P3_Timepoints,], ylim = c(500, 0), col = inferno(100), xaxt = "n")
+image(x = dateMex[P3_Timepoints] + (7 * 60^2), y = oneDepth,  z = (t(data38nb@data$amp))[P3_Timepoints,], ylim = c(500, 0), col = inferno(100), xaxt = "n")
 dr <- range(date)
 axis.POSIXct(1, seq(dr[1], dr[2], by = "day"), at = seq(dr[1], dr[2], by = "day"), format = "%b-%d", las = 2)
 ```
